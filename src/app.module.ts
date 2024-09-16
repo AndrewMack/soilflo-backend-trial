@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SiteModule } from './domain/site/site.module';
+import { TruckModule } from './domain/truck/truck.module';
+import { TicketModule } from './domain/ticket/ticket.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { AppService } from './app.service';
         autoLoadModels: true,
       }),
     }),
+    SiteModule,
+    TruckModule,
+    TicketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
