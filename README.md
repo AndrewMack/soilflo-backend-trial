@@ -122,3 +122,17 @@ create table if not exists tickets (
 		references sites(id)
 )
 ```
+
+## To-Do
+
+### How does Sequelizer relations work?
+
+I've worked with Sequelizer directly; however, for the sake of consistency and conformity with Nest-JS, I want to use and declare Entity Relationships correctly using their techniques and best-practices.
+
+Temporarily, I will use the foreign-keys as primitive values/columns.
+
+In the future, try to figure out how to declare these Relationships and access them the Nest-JS/Sequelize way!
+
+### Pagination for our Controllers
+
+We definitely would want this for `Sites` -- but can definitely see a need for this for `Trucks` and `Tickets` too!
