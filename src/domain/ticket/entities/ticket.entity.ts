@@ -1,4 +1,4 @@
-import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 export enum MaterialType {
   Soil = 'Soil',
@@ -7,7 +7,7 @@ export enum MaterialType {
 @Table({ tableName: 'tickets', timestamps: false })
 export class Ticket extends Model {
   @PrimaryKey
-  @Column
+  @Column({ autoIncrement: true })
   id: number;
 
   @Column({ field: 'truck_id' })
@@ -16,6 +16,12 @@ export class Ticket extends Model {
   @Column({ field: 'site_id' })
   siteId: number;
 
+  @Column({ field: 'site_counter' })
+  siteCounter: number;
+
   @Column({ type: DataType.ENUM({ values: Object.values(MaterialType) }) })
   material: MaterialType;
+
+  @Column({ field: 'dispatched_at' })
+  dispatchedAt: Date;
 }
