@@ -1,17 +1,20 @@
-import { Table } from 'sequelize-typescript';
-import { Model, InferAttributes, InferCreationAttributes, ForeignKey, NonAttribute, CreationOptional } from 'sequelize';
+import { Type } from 'class-transformer';
+import { AutoIncrement, BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Site } from 'src/domain/site/entities/site.entity';
 
 @Table({ tableName: 'trucks', timestamps: false })
-export class Truck extends Model<
-  InferAttributes<Truck>,
-  InferCreationAttributes<Truck>
-> {
-  declare id: CreationOptional<number>;
+export class Truck extends Model {
+  @PrimaryKey
+  @Column({ autoIncrement: true })
+  declare id: number;
 
+  @Column
   declare license: string;
 
-  declare siteId: ForeignKey<Site['id']>;
+  @ForeignKey(() => Site)
+  @Column({ field: 'site_id' })
+  declare siteId: number;
 
-  declare site: NonAttribute<Site>;
+  @BelongsTo(() => Site, 'siteId')
+  declare site: Site;
 }
