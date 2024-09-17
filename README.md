@@ -136,3 +136,11 @@ In the future, try to figure out how to declare these Relationships and access t
 ### Pagination for our Controllers
 
 We definitely would want this for `Sites` -- but can definitely see a need for this for `Trucks` and `Tickets` too!
+
+### Threshold for Ticket's Dispatched-At timestamp
+
+One of the requirements of a Ticket is that Tickets belonging to a Truck cannot share the same Dispatch timestamp. I wonder if perhaps a Threshold should be put in place that could be used to determine the minimum amount of time-difference between Tickets -- Tickets that are just milliseconds apart should likely not be allowed as they are, in a more "real-world" sense, the same time. We would likely want something that is meaningful, while also ensuring this rule would not get in the way for an exceptional situation (ask subject-matter-experts for input).
+
+### Database Transactions
+
+We should be wrapping collections of work into Transactions. When creating Tickets in bulk, it will be weird if some get created while others do not due to error. Look into Sequelize Transactions and see if there is a "Nest-JS" way of wrapping Transactions around our work. May be tricky working through Async functions -- might be fun!
