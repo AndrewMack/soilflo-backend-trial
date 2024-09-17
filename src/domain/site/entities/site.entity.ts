@@ -15,7 +15,4 @@ export class Site extends Model {
 
   @Column
   description: string;
-
-  @HasMany(() => Truck, 'siteId')
-  trucks: Truck[];
 }
