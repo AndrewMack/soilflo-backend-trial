@@ -2,6 +2,8 @@
 
 This project serves to demonstrate my (Andrew J. MacKenzie) abilities, as a coder, to take on the specs of a small project and fulfill them accurately and to completion. [Click here](https://github.com/SoilFLO/interview-takehome-be) to go to the original spec-sheet (repo) on GitHub.
 
+Particular points of interest will most likely be the services `TicketCreationService` and `TicketFetchingService` as well as the controller `TicketController`.
+
 ## Setting up
 
 At the Project's Root run `npm i` to install our dependencies.
@@ -16,11 +18,23 @@ This project connects to a Postgres database. If you do not have one set up, you
 docker run --env=POSTGRES_PASSWORD=yourpassword -p 5432:5432 -d postgres:15-alpine
 ```
 
+#### PG-Admin
+
+Recommended, though not necessary -- PG-Admin provides a User-Interface that makes Database-Management much easier (in my opinion).
+
+```
+docker run --user=pgadmin --env=PGADMIN_DEFAULT_PASSWORD=1234 --env=PGADMIN_DEFAULT_EMAIL=youremail@email.com -p 80:80 --restart=no -d dpage/pgadmin4:7
+```
+
 #### Schema
 
 You can navigate to the Schema scripts in this readme and execute them on your database, or simply use the env-var `DB__SYNCHRONIZE=true` to get going quickly.
 
 > Please do not use `DB__SYNCHRONIZE=true` in a Production environment.
+
+#### Data Seeding
+
+If Data-Seeding is required, my strategy was to grab the data from the [SoilFLO Repository](https://github.com/SoilFLO/interview-takehome-be), convert it to CSV, and import the data through PG-Admin.
 
 #### Schema Scripts
 
