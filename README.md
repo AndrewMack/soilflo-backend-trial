@@ -162,4 +162,6 @@ We should be wrapping collections of work into Transactions. When creating Ticke
 
 ### Serialization concerns ...
 
-This is something that I'm not a fan of -- Nest-JS's solution to the Data-Contract and its coupling with the Entity. While this would be outside of the scope for this project, it would be interesting to find (or create) a solution for Serializing our Entities and/or Business-Objects that does _not_ involve us mucking around with our Entity classes.
+I'm curious to know how others have worked through this. Maybe this is just a personal preference, but I find Nest-JS's solution to the Data-Contract is to couple the Data-Contract to the Entity in the same class.
+
+While this would be outside of the scope for this project, it would be interesting to find (or create) a solution for Serializing our Entities and/or Business-Objects that does _not_ involve us working serialization within those classes.
