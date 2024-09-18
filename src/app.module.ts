@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SiteModule } from './domain/site/site.module';
 import { TruckModule } from './domain/truck/truck.module';
@@ -28,7 +27,6 @@ import { TicketModule } from './domain/ticket/ticket.module';
     TruckModule,
     TicketModule,
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
