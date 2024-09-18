@@ -19,7 +19,7 @@ import { TicketModule } from './domain/ticket/ticket.module';
         host: configService.getOrThrow('DB__HOST'),
         port: configService.getOrThrow('DB__PORT'),
         database: configService.getOrThrow('DB__DATABASE'),
-        synchronize: false,
+        synchronize: configService.get('DB__SYNCHRONIZE') === 'true',
         autoLoadModels: true,
       }),
     }),

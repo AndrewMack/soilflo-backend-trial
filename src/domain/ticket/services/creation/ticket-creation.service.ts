@@ -22,8 +22,6 @@ export class TicketCreationService {
     private readonly ticketFetchingService: TicketFetchingService,
   ) {
     this.logger = new Logger(TicketCreationService.name);
-
-    this.logger.log('I have been constructed!');
   }
 
   /**
@@ -50,7 +48,7 @@ export class TicketCreationService {
     this.validateTicketsOrThrow(dto.tickets);
 
     this.logger.debug(
-      `Creating ${dto.tickets.length} Tickets for Site: ${truck.site?.name}.`,
+      `Creating ${dto.tickets.length} Tickets for Site: ${truck.site.name}.`,
     );
 
     const createdTickets: Ticket[] = [];
@@ -95,6 +93,10 @@ export class TicketCreationService {
     return createdTickets;
   }
 
+  /**
+   * Validates (shallow) the CreateTruckTicket dto's. This will throw a Ticket-Creation-Error if invalid dto's are found.
+   * @param tickets Array of CreateTruckTicket
+   */
   validateTicketsOrThrow(tickets: CreateTruckTicket[]) {
     const now = new Date();
     tickets.forEach((t) => {
