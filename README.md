@@ -111,8 +111,8 @@ create table if not exists tickets (
 	"truckId" int not null,
 	"siteId" int not null,
 	material varchar(32) not null,
-	dispatched_at timestamptz not null,
-	site_counter int default 0 not null,
+	"dispatchedAt" timestamptz not null,
+	"siteCounter" int default 0 not null,
 	primary key (id),
 	constraint fk_truck
 		foreign key ("truckId")
