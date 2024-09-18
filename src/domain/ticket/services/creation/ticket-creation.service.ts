@@ -47,14 +47,11 @@ export class TicketCreationService {
       throw new TicketCreationError(err.message, err.stack, err);
     }
 
+    this.validateTicketsOrThrow(dto.tickets);
+
     this.logger.debug(
       `Creating ${dto.tickets.length} Tickets for Site: ${truck.site?.name}.`,
     );
-
-    const duplicateDispatches = this.getDuplicateDispatchesInArray(dto.tickets);
-    if (duplicateDispatches.length > 0) {
-      throw new TicketCreationError('Duplicate Dispatch timestamps found!');
-    }
 
     const createdTickets: Ticket[] = [];
 
@@ -96,6 +93,22 @@ export class TicketCreationService {
     }
 
     return createdTickets;
+  }
+
+  validateTicketsOrThrow(tickets: CreateTruckTicket[]) {
+    const now = new Date();
+    tickets.forEach((t) => {
+      if (t.dispatchedAt > now) {
+        throw new TicketCreationError(
+          `Tickets cannot be dispatched at a future time. (${t.dispatchedAt}`
+        );
+      }
+    });
+
+    const duplicateDispatches = this.getDuplicateDispatchesInArray(tickets);
+    if (duplicateDispatches.length > 0) {
+      throw new TicketCreationError('Duplicate Dispatch timestamps found!');
+    }
   }
 
   /**
