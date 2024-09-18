@@ -23,9 +23,9 @@ export class TicketFetchingService {
   }
 
   /**
-   * 
-   * @param args 
-   * @returns 
+   * Fetches Tickets using the arguments passed in.
+   * @param args Ticket-Fetch Arguments
+   * @returns An Array of Tickets, ordered by their Dispatched date and Site-Id.
    */
   fetchAllBy(args: TicketFetchArgs) {
     const where: WhereOptions<Ticket> = {};
