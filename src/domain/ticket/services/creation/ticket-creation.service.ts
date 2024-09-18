@@ -5,6 +5,7 @@ import { CreateTruckTicket, CreateTruckTickets } from '../../dto/create-truck-ti
 import { Truck } from 'src/domain/truck/entities/truck.entity';
 import { TicketCreationError } from './errors/ticket-creation.error';
 import { TicketFetchingService } from '../fetching/ticket-fetching.service';
+import { Site } from 'src/domain/site/entities/site.entity';
 
 @Injectable()
 export class TicketCreationService {
@@ -25,7 +26,9 @@ export class TicketCreationService {
   async createTruckTicketsInBulk(dto: CreateTruckTickets) {
     let truck: Truck | null;
     try {
-      truck = await this.truckRepository.findByPk(dto.truckId);
+      truck = await this.truckRepository.findByPk(dto.truckId, {
+        include: [Site],
+      });
       if (truck == null) {
         throw new TicketCreationError(
           `Truck (id: ${dto.truckId}) not found.`,
@@ -36,6 +39,8 @@ export class TicketCreationService {
       throw new TicketCreationError(err.message, err.stack, err);
     }
 
+    this.logger.debug(`Creating Tickets for Site: ${truck.site?.name}.`);
+
     const duplicateDispatches = this.getDuplicateDispatchesInArray(dto.tickets);
     if (duplicateDispatches.length > 0) {
       throw new TicketCreationError('Duplicate Dispatch timestamps found!');
@@ -44,7 +49,7 @@ export class TicketCreationService {
     const createdTickets: Ticket[] = [];
 
     let siteCounter = await this.ticketFetchingService.fetchNextTicketSiteCount(
-      truck.site_id,
+      truck.siteId,
     );
 
     // use for-loop to avoid spawning many Threads
@@ -59,13 +64,21 @@ export class TicketCreationService {
         throw new TicketCreationError('Duplicate Dispatch timestamps found!');
       }
 
-      const newTicket: Ticket = await this.ticketRepository.create({
-        truckId: truck.id,
-        siteId: truck.site_id,
-        siteCounter,
-        material: MaterialType.Soil,
-        dispatchedAt: ticket.dispatchedAt,
-      });
+      const newTicket: Ticket = await this.ticketRepository.create(
+        {
+          truckId: truck.id,
+          siteId: truck.siteId,
+          siteCounter,
+          material: MaterialType.Soil,
+          dispatchedAt: ticket.dispatchedAt,
+        },
+      );
+
+      newTicket.site = truck.site;
+      newTicket.truck = truck;
+
+      console.log(newTicket.siteId);
+      console.log(newTicket.site?.name);
 
       siteCounter += 1;
 

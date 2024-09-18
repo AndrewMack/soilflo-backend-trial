@@ -1,27 +1,45 @@
-import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Exclude, Expose, Transform } from 'class-transformer';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Site } from 'src/domain/site/entities/site.entity';
+import { Truck } from 'src/domain/truck/entities/truck.entity';
 
 export enum MaterialType {
   Soil = 'Soil',
 }
-
+@Exclude()
 @Table({ tableName: 'tickets', timestamps: false })
 export class Ticket extends Model {
   @PrimaryKey
   @Column({ autoIncrement: true })
   id: number;
 
-  @Column({ field: 'truck_id' })
+  @ForeignKey(() => Truck)
+  @Column
   truckId: number;
 
-  @Column({ field: 'site_id' })
+  @Expose({ name: 'truckLicense' })
+  @Transform(({ value }) => value?.license)
+  @BelongsTo(() => Truck)
+  truck: Truck;
+
+  @ForeignKey(() => Site)
+  @Column({ type: DataType.INTEGER })
   siteId: number;
 
-  @Column({ field: 'site_counter' })
+  @Expose({ name: 'siteName' })
+  @Transform(({ value }) => value?.name)
+  @BelongsTo(() => Site)
+  site: Site;
+
+  @Expose({ name: 'ticketNumber' })
+  @Column
   siteCounter: number;
 
+  @Expose()
   @Column({ type: DataType.ENUM({ values: Object.values(MaterialType) }) })
   material: MaterialType;
 
-  @Column({ field: 'dispatched_at' })
+  @Expose()
+  @Column
   dispatchedAt: Date;
 }
