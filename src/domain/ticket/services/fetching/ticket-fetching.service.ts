@@ -56,7 +56,7 @@ export class TicketFetchingService {
 
     return this.ticketRepository.findAll({
       where,
-      order: ['dispatchedAt', 'site'],
+      order: ['dispatchedAt', 'siteId'],
       include: [Site, Truck],
     });
   }
