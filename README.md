@@ -138,6 +138,18 @@ However, just thinking things through -- a *Truck* could, in the future, be assi
 
 We should include `siteId` to our `Tickets` table. We are not duplicating data, we need this information for the scenario described above.
 
+### Endpoints for Trucks & Sites?
+
+##### Question/Observation
+
+> On top of the existing trucks and sites, we need to be able to create a ticket for a truck that describes a load of material being dispatched off site.
+
+I'm not sure if I should be interpereting this as a requirement to create endpoints for Trucks & Sites.
+
+##### Assumption
+
+I assume no, as there are no specs for creating Trucks and Sites; however, it *would* be easy to extract that from the Entities themselves.
+
 ## To-Do
 
 ### How does Sequelizer relations work?
@@ -165,3 +177,22 @@ We should be wrapping collections of work into Transactions. When creating Ticke
 I'm curious to know how others have worked through this. Maybe this is just a personal preference, but I find Nest-JS's solution to the Data-Contract is to couple the Data-Contract to the Entity in the same class.
 
 While this would be outside of the scope for this project, it would be interesting to find (or create) a solution for Serializing our Entities and/or Business-Objects that does _not_ involve us working serialization within those classes.
+
+
+### Thoughts on Restful endpoints and this project
+
+My endpoints do not represent much for Rest. I am quite capable of this; however, there are only 2 endpoints for this project ... and one of them creates tickets in bulk, which I would typically use a functional endpoint for.
+
+The only change I could see is if we wanted to move that endpoint to a Truck.
+
+```
+// current endpoint
+POST /create-truck-tickets
+
+// proposed endpoint
+POST /trucks/{id}/create-tickets
+```
+
+I would still opt for a function-name for the endpoint as `POST .../tickets` would typically only store a single resource, not many.
+
+My reason for _not_ doing this is because I did not want to have 2 Controllers with 1 endpoint in each for *essentially* the same resource. In a more complex (or full) application, this may be beneficial; however, in this case ... I think I already complicated this project enough 😅.
