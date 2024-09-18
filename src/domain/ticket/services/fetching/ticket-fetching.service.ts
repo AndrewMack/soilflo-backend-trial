@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Ticket } from '../../entities/ticket.entity';
+import { Truck } from 'src/domain/truck/entities/truck.entity';
+import { Site } from 'src/domain/site/entities/site.entity';
+import { TicketFetchArgs } from './ticket-fetch.args';
+import { WhereOptions, Op } from 'sequelize';
 
 @Injectable()
 export class TicketFetchingService {
@@ -14,6 +18,46 @@ export class TicketFetchingService {
       where: {
         truckId,
       },
+      include: [Truck, Site],
+    });
+  }
+
+  /**
+   * 
+   * @param args 
+   * @returns 
+   */
+  fetchAllBy(args: TicketFetchArgs) {
+    const where: WhereOptions<Ticket> = {};
+
+    if (args.truckIds != null) {
+      if (args.truckIds.length === 0) {
+        throw new BadRequestException('Truck-Ids cannot be an empty array.');
+      }
+      where.truckId = {
+        [Op.in]: args.truckIds,
+      };
+    }
+
+    if (args.siteIds != null) {
+      if (args.siteIds.length === 0) {
+        throw new BadRequestException('Site-Ids cannot be an empty array.');
+      }
+      where.siteId = {
+        [Op.in]: args.siteIds,
+      };
+    }
+
+    if (args.dateRange != null) {
+      where.dispatchedAt = {
+        [Op.between]: [args.dateRange.start, args.dateRange.end],
+      };
+    }
+
+    return this.ticketRepository.findAll({
+      where,
+      order: ['dispatchedAt', 'site'],
+      include: [Site, Truck],
     });
   }
 
@@ -39,7 +83,7 @@ export class TicketFetchingService {
   /**
    * Fetches the number of Tickets found for a Site.
    * @param siteId Site Identifier
-   * @returns 
+   * @returns The next Ticket-Site-Count (number) of the Site.
    */
   async fetchNextTicketSiteCount(siteId: number) {
     const maxValOrNull = await this.ticketRepository.max<number, Ticket>(
@@ -52,12 +96,5 @@ export class TicketFetchingService {
     );
 
     return (maxValOrNull ?? 0) + 1;
-    /*
-    return this.ticketRepository.count({
-      where: {
-        siteId,
-      },
-    });
-    */
   }
 }

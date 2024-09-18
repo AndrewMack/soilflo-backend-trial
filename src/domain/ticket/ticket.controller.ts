@@ -20,6 +20,20 @@ export class TicketController {
     private readonly ticketFetchingService: TicketFetchingService,
   ) {}
 
+  @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getAll() {
+    const startDate = new Date('2024-09-17T14:40:18.000Z');
+    const endDate = new Date('2024-09-17T14:47:18.000Z');
+    return await this.ticketFetchingService.fetchAllBy({
+      siteIds: [1, 11],
+      dateRange: {
+        start: startDate,
+        end: endDate,
+      },
+    });
+  }
+
   @Post('create-truck-tickets')
   @UseInterceptors(ClassSerializerInterceptor)
   async createInBulk(@Body() dto: CreateTruckTickets) {
