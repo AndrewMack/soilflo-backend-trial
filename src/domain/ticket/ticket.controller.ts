@@ -8,12 +8,14 @@ import {
   Query,
   BadRequestException,
   ParseArrayPipe,
+  Param,
 } from '@nestjs/common';
-import { CreateTruckTickets } from './dto/create-truck-tickets.dto';
+import { CreateTruckTicket, CreateTruckTickets } from './dto/create-truck-tickets.dto';
 import { TicketCreationService } from './services/creation/ticket-creation.service';
 import { TicketFetchingService } from './services/fetching/ticket-fetching.service';
 import { TicketFetchArgs } from './services/fetching/ticket-fetch.args';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller()
 export class TicketController {
   constructor(
@@ -22,7 +24,6 @@ export class TicketController {
   ) {}
 
   @Get('tickets')
-  @UseInterceptors(ClassSerializerInterceptor)
   async getAll(
     @Query('siteIds', new ParseArrayPipe({ items: Number, separator: ',' }))
     siteIds: number[],
@@ -52,8 +53,19 @@ export class TicketController {
     return await this.ticketFetchingService.fetchAllBy(fetchParams);
   }
 
+  @Post('trucks/:truckId/create-tickets')
+  async createTruckTicketsInBulk(
+    @Body(new ParseArrayPipe({ items: CreateTruckTicket }))
+    dto: CreateTruckTicket[],
+    @Param('truckId') truckId: number,
+  ) {
+    return await this.ticketCreationService.createTruckTicketsInBulk({
+      truckId,
+      tickets: dto,
+    });
+  }
+
   @Post('create-truck-tickets')
-  @UseInterceptors(ClassSerializerInterceptor)
   async createInBulk(@Body() dto: CreateTruckTickets) {
     return await this.ticketCreationService.createTruckTicketsInBulk(dto);
   }
