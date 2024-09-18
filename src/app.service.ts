@@ -41,7 +41,4 @@ export class AppService {
 
     return appPort;
   }
-  getHello(): string {
-    return 'Hello World!';
-  }
 }
