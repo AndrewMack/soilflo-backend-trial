@@ -1,5 +1,13 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 import { Site } from 'src/domain/site/entities/site.entity';
 import { Truck } from 'src/domain/truck/entities/truck.entity';
 

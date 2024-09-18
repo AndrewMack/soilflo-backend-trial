@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MaterialType, Ticket } from '../../entities/ticket.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateTruckTicket, CreateTruckTickets } from '../../dto/create-truck-tickets.dto';
+import {
+  CreateTruckTicket,
+  CreateTruckTickets,
+} from '../../dto/create-truck-tickets.dto';
 import { Truck } from 'src/domain/truck/entities/truck.entity';
 import { TicketCreationError } from './errors/ticket-creation.error';
 import { TicketFetchingService } from '../fetching/ticket-fetching.service';
@@ -23,6 +26,11 @@ export class TicketCreationService {
     this.logger.log('I have been constructed!');
   }
 
+  /**
+   * Creates Tickets for a Truck.
+   * @param dto Request-Contract
+   * @returns Array of the created Tickets.
+   */
   async createTruckTicketsInBulk(dto: CreateTruckTickets) {
     let truck: Truck | null;
     try {
@@ -39,7 +47,9 @@ export class TicketCreationService {
       throw new TicketCreationError(err.message, err.stack, err);
     }
 
-    this.logger.debug(`Creating Tickets for Site: ${truck.site?.name}.`);
+    this.logger.debug(
+      `Creating ${dto.tickets.length} Tickets for Site: ${truck.site?.name}.`,
+    );
 
     const duplicateDispatches = this.getDuplicateDispatchesInArray(dto.tickets);
     if (duplicateDispatches.length > 0) {
@@ -64,25 +74,25 @@ export class TicketCreationService {
         throw new TicketCreationError('Duplicate Dispatch timestamps found!');
       }
 
-      const newTicket: Ticket = await this.ticketRepository.create(
-        {
-          truckId: truck.id,
-          siteId: truck.siteId,
-          siteCounter,
-          material: MaterialType.Soil,
-          dispatchedAt: ticket.dispatchedAt,
-        },
-      );
+      // Figure out a way to get Sequelize to load the Site & Truck relationship
+      // in response of this 'create' call.
+      // ** { include } is not the way! (tried)
+      const newTicket: Ticket = await this.ticketRepository.create({
+        truckId: truck.id,
+        siteId: truck.siteId,
+        siteCounter,
+        material: MaterialType.Soil,
+        dispatchedAt: ticket.dispatchedAt,
+      });
 
+      // below is not ideal; however, it seems necessary to avoid re-fetching the Ticket entity
+      // -- ask for help to optimize!
       newTicket.site = truck.site;
       newTicket.truck = truck;
 
-      console.log(newTicket.siteId);
-      console.log(newTicket.site?.name);
+      createdTickets.push(newTicket);
 
       siteCounter += 1;
-
-      createdTickets.push(newTicket);
     }
 
     return createdTickets;
