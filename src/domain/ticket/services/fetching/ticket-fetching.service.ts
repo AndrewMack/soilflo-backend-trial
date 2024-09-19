@@ -28,6 +28,21 @@ export class TicketFetchingService {
    * @returns An Array of Tickets, ordered by their Dispatched date and Site-Id.
    */
   fetchAllBy(args: TicketFetchArgs) {
+    const where: WhereOptions<Ticket> = this.buildFetchAllWhereClause(args);
+
+    return this.ticketRepository.findAll({
+      where,
+      order: ['dispatchedAt', 'siteId'],
+      include: [Site, Truck],
+    });
+  }
+
+  /**
+   * Builds our where-clause for the Ticket-Repository using the arguments passed in.
+   * @param args TicketFetchArgs
+   * @returns Where-Options that can be included in a Query for Tickets.
+   */
+  private buildFetchAllWhereClause(args: TicketFetchArgs) {
     const where: WhereOptions<Ticket> = {};
 
     if (args.truckIds != null) {
@@ -54,11 +69,7 @@ export class TicketFetchingService {
       };
     }
 
-    return this.ticketRepository.findAll({
-      where,
-      order: ['dispatchedAt', 'siteId'],
-      include: [Site, Truck],
-    });
+    return where;
   }
 
   /**
