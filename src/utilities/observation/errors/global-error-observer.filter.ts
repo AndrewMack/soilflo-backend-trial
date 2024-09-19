@@ -15,4 +15,14 @@ export class GlobalErrorObserverFilter extends BaseExceptionFilter {
 
     super.catch(exception, host);
   }
+
+  handleUnknownError(exception: any): void {
+    try {
+      this.logger.error('An Unknown Error occurred:');
+      this.logger.error(exception);
+    } catch (err) {
+      this.logger.error('Error logging Unknown Error:');
+      this.logger.error(err);
+    }
+  }
 }
