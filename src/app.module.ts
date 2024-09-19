@@ -21,6 +21,7 @@ import { TicketModule } from './domain/ticket/ticket.module';
         database: configService.getOrThrow('DB__DATABASE'),
         synchronize: configService.get('DB__SYNCHRONIZE') === 'true',
         autoLoadModels: true,
+        logging: configService.get('DB__LOGS') === 'true',
       }),
     }),
     SiteModule,
