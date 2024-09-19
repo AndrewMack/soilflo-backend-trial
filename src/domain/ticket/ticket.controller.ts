@@ -38,24 +38,11 @@ export class TicketController {
     @Query('endDate')
     endDate: Date,
   ) {
-    const fetchParams: TicketFetchArgs = {};
-    if (siteIds != null) {
-      fetchParams.siteIds = siteIds;
-    }
-
-    if (startDate != null || endDate != null) {
-      if (startDate == null || endDate == null) {
-        throw new BadRequestException(
-          'Both Start-Date & End-Date must by provided.',
-        );
-      }
-
-      fetchParams.dateRange = {
-        start: startDate,
-        end: endDate,
-      };
-    }
-
+    const fetchParams = this.validateAndFetchAllParams(
+      siteIds,
+      startDate,
+      endDate,
+    );
     return await this.ticketFetchingService.fetchAllBy(fetchParams);
   }
 
@@ -74,5 +61,39 @@ export class TicketController {
   @Post('create-truck-tickets')
   async createInBulk(@Body() dto: CreateTruckTickets) {
     return await this.ticketCreationService.createTruckTicketsInBulk(dto);
+  }
+
+  /**
+   * Validates & builds the Parameters for the call to Fetch-All Tickets.
+   *
+   * This will throw a BadRequest if Validation fails.
+   * @param siteIds Array of Site ID's
+   * @param startDate Start-Date of the Date-Range
+   * @param endDate End-Date of the Date-Range
+   */
+  private validateAndFetchAllParams(
+    siteIds?: number[],
+    startDate?: Date,
+    endDate?: Date,
+  ) {
+    const fetchParams: TicketFetchArgs = {};
+    if (siteIds != null) {
+      fetchParams.siteIds = siteIds;
+    }
+
+    if (startDate != null || endDate != null) {
+      if (startDate == null || endDate == null) {
+        throw new BadRequestException(
+          'Both Start-Date & End-Date must by provided.',
+        );
+      }
+
+      fetchParams.dateRange = {
+        start: startDate,
+        end: endDate,
+      };
+    }
+
+    return fetchParams;
   }
 }
