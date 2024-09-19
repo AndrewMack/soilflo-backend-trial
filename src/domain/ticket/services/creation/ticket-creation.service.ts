@@ -30,26 +30,13 @@ export class TicketCreationService {
    * @returns Array of the created Tickets.
    */
   async createTruckTicketsInBulk(dto: CreateTruckTickets) {
-    let truck: Truck | null;
-    try {
-      truck = await this.truckRepository.findByPk(dto.truckId, {
-        include: [Site],
-      });
-      if (truck == null) {
-        throw new TicketCreationError(
-          `Truck (id: ${dto.truckId}) not found.`,
-          new Error().stack,
-        );
-      }
-    } catch (err) {
-      throw new TicketCreationError(err.message, err.stack, err);
-    }
-
-    this.validateTicketsOrThrow(dto.tickets);
+    const truck: Truck = await this.fetchTruckOrFail(dto.truckId);
 
     this.logger.debug(
-      `Creating ${dto.tickets.length} Tickets for Site: ${truck.site.name}.`,
+      `Creating ${dto.tickets.length} Tickets for Site: ${truck.site.name}...`,
     );
+
+    this.validateTicketsOrThrow(dto.tickets);
 
     const createdTickets: Ticket[] = [];
 
@@ -57,40 +44,93 @@ export class TicketCreationService {
       truck.siteId,
     );
 
-    // use for-loop to avoid spawning many Threads
+    // use for-loop to avoid spawning many Threads (unnecessary).
     for (let i = 0; i < dto.tickets.length; i++) {
-      const ticket: CreateTruckTicket = dto.tickets[i];
-      const exists =
-        await this.ticketFetchingService.existsByTruckIdAndDispatch(
-          dto.truckId,
-          ticket.dispatchedAt,
-        );
-      if (exists) {
-        throw new TicketCreationError('Duplicate Dispatch timestamps found!');
-      }
-
-      // Figure out a way to get Sequelize to load the Site & Truck relationship
-      // in response of this 'create' call.
-      // ** { include } is not the way! (tried)
-      const newTicket: Ticket = await this.ticketRepository.create({
-        truckId: truck.id,
-        siteId: truck.siteId,
+      const newTicket = await this.createAndPersistNewTicket(
+        dto.tickets[i],
+        truck,
         siteCounter,
-        material: MaterialType.Soil,
-        dispatchedAt: ticket.dispatchedAt,
-      });
-
-      // below is not ideal; however, it seems necessary to avoid re-fetching the Ticket entity
-      // -- ask for help to optimize!
-      newTicket.site = truck.site;
-      newTicket.truck = truck;
+      );
 
       createdTickets.push(newTicket);
 
       siteCounter += 1;
     }
 
+    if (createdTickets.length === 0) {
+      this.logger.warn('No Tickets were created:');
+      this.logger.warn(dto);
+    } else {
+      this.logger.debug(
+        `${createdTickets.length} Tickets were created for Site: ${truck.site.name}!`,
+      );
+    }
+
     return createdTickets;
+  }
+
+  /**
+   * Creates a Ticket for the Truck & persists to the Database.
+   * @param ticketDto CreateTruckTicket
+   * @param truck Truck
+   * @param siteCounter Next Ticket-Count for the Ticket's Site.
+   * @returns The new Ticket.
+   */
+  private async createAndPersistNewTicket(
+    ticketDto: CreateTruckTicket,
+    truck: Truck,
+    siteCounter: number,
+  ) {
+    const exists = await this.ticketFetchingService.existsByTruckIdAndDispatch(
+      truck.id,
+      ticketDto.dispatchedAt,
+    );
+    if (exists) {
+      throw new TicketCreationError('Duplicate Dispatch timestamps found!');
+    }
+
+    // Figure out a way to get Sequelize to load the Site & Truck relationship
+    // in response of this 'create' call.
+    // ** { include } is not the way! (tried)
+    const newTicket: Ticket = await this.ticketRepository.create({
+      truckId: truck.id,
+      siteId: truck.siteId,
+      siteCounter,
+      material: MaterialType.Soil,
+      dispatchedAt: ticketDto.dispatchedAt,
+    });
+
+    // below is not ideal; however, it seems necessary to avoid re-fetching the Ticket entity
+    // -- ask for help to optimize!
+    newTicket.site = truck.site;
+    newTicket.truck = truck;
+
+    return newTicket;
+  }
+
+  /**
+   * Fetches a Truck from the Database or throws a TicketCreationError.
+   * @param truckId ID of the Truck to fetch.
+   * @returns Truck
+   */
+  private async fetchTruckOrFail(truckId: number) {
+    let truck: Truck | null;
+    try {
+      truck = await this.truckRepository.findByPk(truckId, {
+        include: [Site],
+      });
+    } catch (err) {
+      throw new TicketCreationError(err.message, err.stack, err);
+    }
+
+    if (truck == null) {
+      throw new TicketCreationError(
+        `Truck (id: ${truckId}) not found.`,
+        new Error().stack,
+      );
+    }
+
+    return truck;
   }
 
   /**
