@@ -10,7 +10,10 @@ import {
   ParseArrayPipe,
   Param,
 } from '@nestjs/common';
-import { CreateTruckTicket, CreateTruckTickets } from './dto/create-truck-tickets.dto';
+import {
+  CreateTruckTicket,
+  CreateTruckTickets,
+} from './dto/create-truck-tickets.dto';
 import { TicketCreationService } from './services/creation/ticket-creation.service';
 import { TicketFetchingService } from './services/fetching/ticket-fetching.service';
 import { TicketFetchArgs } from './services/fetching/ticket-fetch.args';
@@ -25,7 +28,10 @@ export class TicketController {
 
   @Get('tickets')
   async getAll(
-    @Query('siteIds', new ParseArrayPipe({ items: Number, separator: ',' }))
+    @Query(
+      'siteIds',
+      new ParseArrayPipe({ items: Number, separator: ',', optional: true }),
+    )
     siteIds: number[],
     @Query('startDate')
     startDate: Date,
