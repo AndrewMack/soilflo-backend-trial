@@ -34,7 +34,12 @@ You can navigate to the Schema scripts in this readme and execute them on your d
 
 #### Data Seeding
 
-If Data-Seeding is required, my strategy was to grab the data from the [SoilFLO Repository](https://github.com/SoilFLO/interview-takehome-be), convert it to CSV, and import the data through PG-Admin.
+##### Automatic Data-Seeding
+
+You may automatically seed the application with Data using the env-var `DB__RUN_SEEDS` and providing a value of `true` or `if-empty`. By default, this configuration value is `false`.
+
+##### PG-Admin "seeding"
+Using the data from the [SoilFLO Repository](https://github.com/SoilFLO/interview-takehome-be), convert it to CSV, and import the data through PG-Admin.
 
 #### Schema Scripts
 
