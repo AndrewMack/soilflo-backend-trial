@@ -10,6 +10,27 @@ At the Project's Root run `npm i` to install our dependencies.
 
 Next, run `cp .env.example .env` to get yourself started filling out the required env-vars.
 
+```
+# Example of Database configurations to fill out.
+
+DB__USERNAME=user1
+DB__PASSWORD=secretsauce
+DB__HOST=localhost
+DB__PORT=5432
+DB__DATABASE=soilflo
+
+# {true / false}
+DB__SYNCHRONIZE=true
+
+# {true / false}
+DB__LOGS=false
+
+# {true / false, if-empty}
+DB__RUN_SEEDS=if-empty
+```
+
+If your database is configured and running, you may run `npm run start` to get this project going!
+
 ### Database Setup
 
 This project connects to a Postgres database. If you do not have one set up, you can get one going quickly using Docker. Feel free to find an image to run, or use the script below to get yourself going.
@@ -93,19 +114,19 @@ create table if not exists tickets (
 )
 ```
 
-## Questions For Clarity
+## Questions for Discussion?
 
-As this is for an interview, I am of the understanding that we do not get the opportunity to ask questions for the sake of clarity. Therefore, I will pose my questions here, along with my assumption, to demonstrate where opportunities for correction may have been able to take place.
+I took this on without asking questions. I believe this was a mistake; however, below are questions and observations that I had as I worked on the project. Perhaps we can chat about 1 or 2 of these during the interview -- I want to reduce the amount of time you need with me as I am not an employee!
 
 ### Ticket Site-Counter
 
 ##### Observation/Question
 
-> A ticket has a number that is incremented per site
+> A ticket has a number that is incremented per site.
 
 First, a *Ticket* does not have a *Site* when dispatched.
 
-Next is the question of *when* should the increment occur ... which may also then ask the question of the meaing or purpose of this counter.
+Next is the question of *when* should the increment occur ... which may also then ask the question of the meaning or purpose of this counter.
 
 ##### Assumption
 
