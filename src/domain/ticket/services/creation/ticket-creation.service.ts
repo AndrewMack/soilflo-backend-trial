@@ -142,7 +142,7 @@ export class TicketCreationService {
     tickets.forEach((t) => {
       if (t.dispatchedAt > now) {
         throw new TicketCreationError(
-          `Tickets cannot be dispatched at a future time. (${t.dispatchedAt}`
+          `Tickets cannot be dispatched at a future time. (${t.dispatchedAt}`,
         );
       }
     });

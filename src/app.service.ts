@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { SiteSeedingService } from './domain/site/services/site-seeding.service';
 import { TruckSeedingService } from './domain/truck/services/truck-seeding.service';
 
+type RunSeedsConfigOption = 'true' | 'false' | 'if-empty';
+
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
   private readonly logger: Logger = new Logger(AppService.name);
@@ -16,12 +18,20 @@ export class AppService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     this.logger.debug('Application has been boostrapped!');
 
-    if (this.configService.get('DB__RUN_SEEDS') !== 'true') {
-      this.checkForRecords();
+    const runSeedsConfig: RunSeedsConfigOption = this.configService.get(
+      'DB__RUN_SEEDS',
+      'false',
+    );
+
+    if (runSeedsConfig === 'true') {
+      this.runSeeds();
       return;
     }
 
-    this.runSeeds();
+    const hasMissingRecords = await this.checkForRecords();
+    if (runSeedsConfig === 'if-empty' && hasMissingRecords) {
+      this.runSeeds();
+    }
   }
 
   /**
@@ -44,6 +54,8 @@ export class AppService implements OnApplicationBootstrap {
       this.logger.warn('Consider configuring the application with the Seeder:');
       this.logger.warn('.env :: DB__RUN_SEEDS=true');
     }
+
+    return hasMissingRecords;
   }
 
   /**
@@ -52,8 +64,19 @@ export class AppService implements OnApplicationBootstrap {
   private async runSeeds() {
     this.logger.log('Running Data-Seeds!');
 
-    await this.siteSeedingService.seed();
-    await this.truckSeedingService.seed();
+    try {
+      await this.siteSeedingService.seed();
+    } catch (err) {
+      this.logger.error('Failed to seed Sites Data:');
+      this.logger.error(err);
+    }
+
+    try {
+      await this.truckSeedingService.seed();
+    } catch (err) {
+      this.logger.error('Failed to seed Trucks Data:');
+      this.logger.error(err);
+    }
 
     this.logger.log('Data-Seeds have run!');
   }
