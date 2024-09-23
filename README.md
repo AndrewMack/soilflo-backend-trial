@@ -178,7 +178,7 @@ I assume no, as there are no specs for creating Trucks and Sites; however, it *w
 
 ## To-Do
 
-### How does Sequelizer relations work?
+### How does Sequelizer relations work? (this has been done) (ask about best-practices)
 
 I've worked with Sequelizer directly; however, for the sake of consistency and conformity with Nest-JS, I want to use and declare Entity Relationships correctly using their techniques and best-practices.
 
