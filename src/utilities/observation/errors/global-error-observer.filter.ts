@@ -1,5 +1,5 @@
-import { Catch, ArgumentsHost, Logger } from '@nestjs/common';
-import { BaseExceptionFilter } from '@nestjs/core';
+import { Catch, ArgumentsHost, Logger, HttpServer } from '@nestjs/common';
+import { AbstractHttpAdapter, BaseExceptionFilter } from '@nestjs/core';
 
 @Catch()
 export class GlobalErrorObserverFilter extends BaseExceptionFilter {
@@ -16,7 +16,11 @@ export class GlobalErrorObserverFilter extends BaseExceptionFilter {
     super.catch(exception, host);
   }
 
-  handleUnknownError(exception: any): void {
+  handleUnknownError(
+    exception: any,
+    host: ArgumentsHost,
+    applicationRef: AbstractHttpAdapter | HttpServer,
+  ): void {
     try {
       this.logger.error('An Unknown Error occurred:');
       this.logger.error(exception);
@@ -24,5 +28,7 @@ export class GlobalErrorObserverFilter extends BaseExceptionFilter {
       this.logger.error('Error logging Unknown Error:');
       this.logger.error(err);
     }
+
+    super.handleUnknownError(exception, host, applicationRef);
   }
 }

@@ -38,7 +38,7 @@ export class TicketController {
     @Query('endDate')
     endDate: Date,
   ) {
-    const fetchParams = this.validateAndFetchAllParams(
+    const fetchParams = this.validateAndBuildFetchAllParams(
       siteIds,
       startDate,
       endDate,
@@ -71,7 +71,7 @@ export class TicketController {
    * @param startDate Start-Date of the Date-Range
    * @param endDate End-Date of the Date-Range
    */
-  private validateAndFetchAllParams(
+  private validateAndBuildFetchAllParams(
     siteIds?: number[],
     startDate?: Date,
     endDate?: Date,
